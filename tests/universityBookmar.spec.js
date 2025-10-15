@@ -27,42 +27,61 @@ test('Should login successfully with valid email and OTP, then verify signout fl
   ]);
   await expect(page).toHaveURL(baseUrl);
 
+
+   const closeGuideButton = page.locator('.driver-popover-close-btn');
+  try {
+    await closeGuideButton.click({ timeout: 2000 });
+  } catch (error) {
+    // Ignore if popup is not present
+  }
+
+
   //step 3: click Universities icon 
-    await page.locator('button:has(span:text("Universities"))').click();
-
-
-    // step 4: Find the university card by its name
-const universityCard = page.getByRole('heading', { name: 'Nagoya University' }).locator('..').locator('..');
-const bookmarkBtn = universityCard.getByRole('button', { name: 'Remove bookmark' });
-const isPressed = await bookmarkBtn.getAttribute('aria-pressed');
-if (isPressed === 'false') {
-  await bookmarkBtn.click();
-}
-
-    
+   const universitiesBtn = page.locator('button:has(span:text("Universities"))');
+// Wait for button to be visible, enabled, and not blocked
+await universitiesBtn.waitFor({ state: 'visible', timeout: 150000 });
+await page.waitForFunction(() => !document.body.classList.contains('driver-active'));
+const closeBtn = page.locator('button:has-text("Close")');
+if (await closeBtn.isVisible()) await closeBtn.click();
+await universitiesBtn.click();
 
 
 
 
-  // Step 4: Open settings and verify sign out button
-  await page.getByText('Settings').click();
-  await expect(page.getByText('Sign out')).toBeVisible();
 
-  // Step 5: Test sign out dialog
-  await page.getByText('Sign out').click();
-  const dialog = page.getByRole('alertdialog');
-  await expect(dialog).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Sign Out' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Cancel' })).toBeVisible();
+  // step 4: Find the university card by its name
+await page.waitForSelector('h3:has-text("Tokyo")', { timeout: 15000 });
+const bookmarkBtn = page.getByRole('button', { name: /bookmark/i });
+await bookmarkBtn.first().waitFor({ state: 'visible', timeout: 15000 });
+await bookmarkBtn.first().click();
 
 
-  // Step 6: Complete sign out
-  await page.getByText('Sign out').click();
-  await expect(dialog).toBeVisible();
-  await Promise.all([
-    page.waitForNavigation({ url: `${baseUrl}/login` }),
-    page.getByRole('button', { name: 'Sign Out' }).click()
-  ]);
+
+ // Step 5: Open settings and verify sign out button
+await page.getByRole('link', { name: 'Settings' }).click(); // safer than getByText
+const signOutBtn = page.getByRole('button', { name: /^Sign Out$/i });
+await expect(signOutBtn).toBeVisible();
+
+// Step 6: Open the sign out confirmation dialog
+await signOutBtn.click();
+
+// Wait for the dialog to appear
+const dialog = page.getByRole('alertdialog', { name: 'Sign Out' });
+await expect(dialog).toBeVisible();
+
+// Confirm buttons inside the dialog
+const confirmSignOut = dialog.getByRole('button', { name: /^Sign Out$/i });
+const cancelBtn = dialog.getByRole('button', { name: /^Cancel$/i });
+
+await expect(confirmSignOut).toBeVisible();
+await expect(cancelBtn).toBeVisible();
+
+// Step 7: Complete sign out
+await Promise.all([
+  page.waitForNavigation({ url: `${baseUrl}/login` }),
+  confirmSignOut.click(),
+]);
+
 
 });
 
