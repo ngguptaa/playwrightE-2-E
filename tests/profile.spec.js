@@ -74,7 +74,16 @@ test.describe("Profile Page Test - Navijapan", () => {
     // await nationalityDropdown.click();
     // await page.waitForSelector('[role="option"]');
     // await page.selectOption("select", { value: "India" });
-   await page.locator('[data-state="unchecked"]').first().click();
+   await page
+      .getByRole("checkbox", {
+        name: "I agree to the Privacy Policy and consent to the processing of my personal data",
+      })
+      .check();
+    await page
+      .getByRole("checkbox", {
+        name: "I accept the Terms and Conditions of service",
+      })
+      .check();
 
    await expect(page.locator('[data-state="checked"]').first()).toBeVisible();
     await page
