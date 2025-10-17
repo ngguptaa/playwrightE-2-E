@@ -39,6 +39,8 @@ test.describe("Profile Page Test - Navijapan", () => {
     await page.getByText("Me", { exact: true }).click();
     await expect(page).toHaveURL(/profile/i);
 
+    
+
     // Step 5: Scroll before interacting with Date picker
     const dobButton = page.getByRole("button", {
       name: /date of birth|october \d+, \d+/i,
@@ -74,23 +76,23 @@ test.describe("Profile Page Test - Navijapan", () => {
     // await nationalityDropdown.click();
     // await page.waitForSelector('[role="option"]');
     // await page.selectOption("select", { value: "India" });
-   await page
-      .getByRole("checkbox", {
-        name: "I agree to the Privacy Policy and consent to the processing of my personal data",
-      })
-      .check();
-    await page
-      .getByRole("checkbox", {
-        name: "I accept the Terms and Conditions of service",
-      })
-      .check();
+    // // Checkbox 1
+    // const privacyCheckbox = page.locator('button[role="checkbox"]#privacy');
+    // await privacyCheckbox.waitFor({ state: "visible", timeout: 7000 });
+    // await privacyCheckbox.click({ force: true });
 
-   await expect(page.locator('[data-state="checked"]').first()).toBeVisible();
+    // // Click the "Terms and Conditions" checkbox
+    // const termsCheckbox = page.locator('button[role="checkbox"]#terms');
+    // await termsCheckbox.waitFor({ state: "visible", timeout: 5000 });
+    // await termsCheckbox.click({ force: true });
+
     await page
-      .locator(
-        'xpath=//*[@id="radix-«rd»-content-personal"]/div/div[2]/form/div[7]/button'
-      )
+      .getByText("checkbox", { name: "I agree to the Privacy Policy" })
       .click();
+    await page
+      .getByText("checkbox", { name: "I accept the Terms and" })
+      .click();
+    await page.getByRole("button", { name: "Save Personal Profile" }).click();
 
     // const toast = page.locator('div[role="alert"]:has-text("success")');
     // await expect(toast).toBeVisible({ timeout: 5000 });
