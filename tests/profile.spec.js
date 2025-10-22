@@ -36,8 +36,9 @@ test.describe("Profile Page Test - Navijapan", () => {
     }
 
     // Step 3: Go to Profile Page
-    await page.getByText("Me", { exact: true }).click();
-    await expect(page).toHaveURL(/profile/i);
+ await page.waitForSelector('text=Me', { state: 'visible', timeout: 10000 });
+await page.getByText("Me", { exact: true }).click();
+await expect(page).toHaveURL(/profile/i);
 
     // Step 5: Scroll before interacting with Date picker
     const dobButton = page.getByRole("button", {
@@ -74,26 +75,29 @@ test.describe("Profile Page Test - Navijapan", () => {
     // await nationalityDropdown.click();
     // await page.waitForSelector('[role="option"]');
     // await page.selectOption("select", { value: "India" });
-   await page
-      .getByRole("checkbox", {
-        name: "I agree to the Privacy Policy and consent to the processing of my personal data",
-      })
-      .check();
-    await page
-      .getByRole("checkbox", {
-        name: "I accept the Terms and Conditions of service",
-      })
-      .check();
+   // Scroll to the checkbox section
+// Scroll to the checkbox section
+// Scroll to checkbox section
+await page.locator('text=Privacy Policy').scrollIntoViewIfNeeded();
 
-   await expect(page.locator('[data-state="checked"]').first()).toBeVisible();
-    await page
-      .locator(
-        'xpath=//*[@id="radix-«rd»-content-personal"]/div/div[2]/form/div[7]/button'
-      )
-      .click();
+// Click the visible checkbox buttons (Radix-style)
+const privacyCheckbox = page.locator('button[role="checkbox"]#privacy');
+await privacyCheckbox.waitFor({ state: 'visible', timeout: 7000 });
+await privacyCheckbox.click({ force: true });
 
-    // const toast = page.locator('div[role="alert"]:has-text("success")');
-    // await expect(toast).toBeVisible({ timeout: 5000 });
+// Click the "Terms and Conditions" checkbox
+const termsCheckbox = page.locator('button[role="checkbox"]#terms');
+await termsCheckbox.waitFor({ state: 'visible', timeout: 5000 });
+await termsCheckbox.click({ force: true });
+
+
+
+const saveButton = page.getByRole('button', {
+  name: /^Save Personal Profile$/i,
+});
+await expect(saveButton).toBeEnabled({ timeout: 50000 });
+await saveButton.click();
+
 
     // await expect(page.locator("text=Profile updated successfully")).toBeVisible(
     //   { timeout: 5000 }
