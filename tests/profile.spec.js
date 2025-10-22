@@ -36,8 +36,9 @@ test.describe("Profile Page Test - Navijapan", () => {
     }
 
     // Step 3: Go to Profile Page
-    await page.getByText("Me", { exact: true }).click();
-    await expect(page).toHaveURL(/profile/i);
+ await page.waitForSelector('text=Me', { state: 'visible', timeout: 10000 });
+await page.getByText("Me", { exact: true }).click();
+await expect(page).toHaveURL(/profile/i);
 
     
 
@@ -94,8 +95,6 @@ test.describe("Profile Page Test - Navijapan", () => {
       .click();
     await page.getByRole("button", { name: "Save Personal Profile" }).click();
 
-    // const toast = page.locator('div[role="alert"]:has-text("success")');
-    // await expect(toast).toBeVisible({ timeout: 5000 });
 
     // await expect(page.locator("text=Profile updated successfully")).toBeVisible(
     //   { timeout: 5000 }
